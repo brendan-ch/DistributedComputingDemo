@@ -26,6 +26,12 @@ struct DistributedComputingContentView: View {
     var body: some View {
         VStack(spacing: 0) {
             List {
+                Section {
+                    Image("space")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                }
+                
                 Section(
                     header: Text("Toggle computing"),
                     footer: Text(tasksModel.distributedComputingEnabled ? "Monitoring for tasks on the server." : "Turn on to retrieve tasks from the server.")
@@ -61,7 +67,7 @@ struct DistributedComputingContentView: View {
                 }
                 
             }
-            .navigationTitle("Node Settings")
+            .navigationTitle("SpaceSync Node")
             
             if let taskToExecuteNext = tasksModel.taskToExecuteNext {
                 if taskToExecuteNext.status == .executing {
