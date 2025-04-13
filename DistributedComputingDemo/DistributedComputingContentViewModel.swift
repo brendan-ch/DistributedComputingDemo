@@ -43,7 +43,7 @@ struct TaskFromServerResponse: Decodable {
     let code: String
     let status: String
     let result: String?
-    let device_id: Int
+    let device_id: Int?
 }
 
 class DistributedComputingContentViewModel: ObservableObject {
