@@ -65,12 +65,14 @@ struct DistributedComputingContentView: View {
                 return
             }
             
-            if let error = error {
-                viewModel.taskToExecuteNext?.status = .failed
-                viewModel.taskToExecuteNext?.error = error
-            } else if let result = result {
-                viewModel.taskToExecuteNext?.status = .succeeded
-                viewModel.taskToExecuteNext?.result = result
+            withAnimation {
+                if let error = error {
+                    viewModel.taskToExecuteNext?.status = .failed
+                    viewModel.taskToExecuteNext?.error = error
+                } else if let result = result {
+                    viewModel.taskToExecuteNext?.status = .succeeded
+                    viewModel.taskToExecuteNext?.result = result
+                }
             }
         }
     }
