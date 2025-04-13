@@ -9,6 +9,7 @@ import SwiftUI
 
 struct DistributedComputingContentView: View {
     @EnvironmentObject var tasksModel: GlobalTasksModel
+    @Environment(\.colorScheme) var colorScheme
     
     var lastRunText: String {
         if let taskToExecuteNext = tasksModel.taskToExecuteNext {
@@ -23,51 +24,53 @@ struct DistributedComputingContentView: View {
     }
     
     var body: some View {
-        List {
-            Section(
-                header: Text("Toggle computing"),
-                footer: Text(tasksModel.distributedComputingEnabled ? "Monitoring for tasks on the server." : "Turn on to retrieve tasks from the server.")
-            ) {
-                Toggle(isOn: $tasksModel.distributedComputingEnabled) {
-                    Text("Computing enabled")
+        VStack(spacing: 0) {
+            List {
+                Section(
+                    header: Text("Toggle computing"),
+                    footer: Text(tasksModel.distributedComputingEnabled ? "Monitoring for tasks on the server." : "Turn on to retrieve tasks from the server.")
+                ) {
+                    Toggle(isOn: $tasksModel.distributedComputingEnabled) {
+                        Text("Computing enabled")
+                    }
+                    
+                    TextField("Server base URL", text: $tasksModel.baseUrl)
+                        .keyboardType(.URL)
+                        .autocorrectionDisabled()
                 }
                 
-                TextField("Server base URL", text: $tasksModel.baseUrl)
-                    .keyboardType(.URL)
-                    .autocorrectionDisabled()
+                Section(
+                    header: Text("Past runs"),
+                    footer: Text(lastRunText)
+                ) {
+                    NavigationLink(destination: TaskListHistoryView()) {
+                        Text("View past runs")
+                    }
+                }
+                
+                Section {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("How this works", systemImage: "info.circle")
+                            .font(.headline)
+                        Text("When computing is enabled, your device will check in with the server periodically to retrieve a JavaScript-based task. If one is found, it executes the code and reports the result back to the server.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                }
+                
             }
+            .navigationTitle("Node Settings")
             
-            Section(
-                header: Text("Past runs"),
-                footer: Text(lastRunText)
-            ) {
-                NavigationLink(destination: TaskListHistoryView()) {
-                    Text("View past runs")
+            if let taskToExecuteNext = tasksModel.taskToExecuteNext {
+                if taskToExecuteNext.status == .executing {
+                    // Display the web view to execute the task
+                    JavaScriptExecutableWebView(javascriptString: taskToExecuteNext.javascriptCode, completionHandler: webViewCallback)
+                        .frame(height: 0)
+                        .background(Color(colorScheme == .light ? UIColor.secondarySystemBackground : UIColor.systemBackground))
                 }
             }
-            
-            Section {
-                VStack(alignment: .leading, spacing: 8) {
-                    Label("How this works", systemImage: "info.circle")
-                        .font(.headline)
-                    Text("When computing is enabled, your device will check in with the server periodically to retrieve a JavaScript-based task. If one is found, it executes the code and reports the result back to the server.")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.vertical, 4)
-            }
-            
         }
-        .navigationTitle("Node Settings")
-        
-        if let taskToExecuteNext = tasksModel.taskToExecuteNext {
-            if taskToExecuteNext.status == .executing {
-                // Display the web view to execute the task
-                JavaScriptExecutableWebView(javascriptString: taskToExecuteNext.javascriptCode, completionHandler: webViewCallback)
-                    .frame(height: 0)
-            }
-        }
-        
     }
     
     func webViewCallback(_ result: Any?, _ error: Any?) {
