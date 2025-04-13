@@ -10,6 +10,18 @@ import SwiftUI
 struct DistributedComputingContentView: View {
     @StateObject var viewModel = DistributedComputingContentViewModel()
     
+    var lastRunText: String {
+        if let taskToExecuteNext = viewModel.taskToExecuteNext {
+            if taskToExecuteNext.status == .executing {
+                return "Executing now..."
+            }
+            if let completedAt = taskToExecuteNext.completedAt {
+                return "Last run: \(completedAt.description)"
+            }
+        }
+        return "Last run: N/A"
+    }
+    
     var body: some View {
         List {
             Section(
@@ -21,13 +33,12 @@ struct DistributedComputingContentView: View {
                 }
             }
             
-            Section("Past runs") {
-                if viewModel.taskHistory.isEmpty {
-                    Text("Past task runs will go here.")
-                } else {
-                    ForEach(viewModel.taskHistory) { task in
-                        Text(task.name)
-                    }
+            Section(
+                header: Text("Past runs"),
+                footer: Text(lastRunText)
+            ) {
+                NavigationLink(destination: TaskListHistoryView()) {
+                    Text("View past runs")
                 }
             }
             

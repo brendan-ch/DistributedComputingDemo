@@ -22,7 +22,14 @@ struct TaskFromServer: Identifiable {
     var result: Any? = nil
     var error: Any? = nil
     
-    var status: TaskStatus = .executing
+    var status: TaskStatus = .executing {
+        didSet {
+            if hasCompleted {
+                completedAt = Date()
+            }
+        }
+    }
+    var completedAt: Date? = nil
     var hasCompleted: Bool {
         status == .failed || status == .succeeded
     }
@@ -35,7 +42,6 @@ struct TaskFromServer: Identifiable {
 class DistributedComputingContentViewModel: ObservableObject {
     @Published var distributedComputingEnabled = false
     
-    @Published var taskHistory: [TaskFromServer] = []
     @Published var taskToExecuteNext: TaskFromServer?
     
     private var dataRefreshLoopTask: Task<Void, Error>?
@@ -115,6 +121,7 @@ addTwoNumbers();
     func publishTaskCompletionToServer() {
         print("Simulating task completion publish")
         
-        taskToExecuteNext = nil
+        // Leave the task in the view model for reference
+//        taskToExecuteNext = nil
     }
 }
