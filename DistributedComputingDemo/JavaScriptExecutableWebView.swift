@@ -17,6 +17,7 @@ struct JavaScriptExecutableWebView: UIViewRepresentable {
         config.websiteDataStore = WKWebsiteDataStore.nonPersistent()
         
         let webView = WKWebView(frame: .zero, configuration: config)
+        webView.isHidden = true
         
         return webView
     }
