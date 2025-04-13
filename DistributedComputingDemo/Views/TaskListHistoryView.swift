@@ -15,12 +15,13 @@ struct TaskListHistoryView: View {
         List {
             ForEach(tasksModel.pastTasks) { task in
                 NavigationLink {
-                    Text("Past task")
+                    TaskView(task: task)
                 } label: {
                     Text("Task \(task.id)")
                 }
             }
         }
+        .navigationTitle("Past Runs")
     }
 }
 
