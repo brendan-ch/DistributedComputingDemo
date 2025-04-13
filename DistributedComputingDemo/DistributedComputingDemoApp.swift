@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct DistributedComputingDemoApp: App {
+    @State var tabSelection: Int = 0
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationStack {
+                TasksListView()
+            }
         }
     }
 }
