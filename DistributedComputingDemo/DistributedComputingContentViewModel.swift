@@ -32,7 +32,7 @@ struct TaskFromServer: Identifiable {
     }
 }
 
-class DistributedComputingTasksModel: ObservableObject {
+class DistributedComputingContentViewModel: ObservableObject {
     @Published var distributedComputingEnabled = false
     
     @Published var taskHistory: [TaskFromServer] = []

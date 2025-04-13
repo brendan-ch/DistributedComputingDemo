@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DistributedComputingContentView: View {
-    @StateObject var tasksModel = DistributedComputingTasksModel()
+    @StateObject var viewModel = DistributedComputingContentViewModel()
     
     var body: some View {
         List {
@@ -16,16 +16,16 @@ struct DistributedComputingContentView: View {
                 header: Text("Toggle computing"),
                 footer: Text("Allow tasks to run on this device.")
             ) {
-                Toggle(isOn: $tasksModel.distributedComputingEnabled) {
+                Toggle(isOn: $viewModel.distributedComputingEnabled) {
                     Text("Computing enabled")
                 }
             }
             
             Section("Past runs") {
-                if tasksModel.taskHistory.isEmpty {
+                if viewModel.taskHistory.isEmpty {
                     Text("Past task runs will go here.")
                 } else {
-                    ForEach(tasksModel.taskHistory) { task in
+                    ForEach(viewModel.taskHistory) { task in
                         Text(task.name)
                     }
                 }
@@ -38,7 +38,7 @@ struct DistributedComputingContentView: View {
         }
         .navigationTitle("Home")
         
-        if let taskToExecuteNext = tasksModel.taskToExecuteNext {
+        if let taskToExecuteNext = viewModel.taskToExecuteNext {
             if taskToExecuteNext.status == .executing {
                 // Display the web view to execute the task
                 JavaScriptExecutableWebView(javascriptString: taskToExecuteNext.javascriptCode, completionHandler: webViewCallback)
@@ -49,17 +49,17 @@ struct DistributedComputingContentView: View {
     }
     
     func webViewCallback(_ result: Any?, _ error: Any?) {
-        if let taskToExecuteNext = tasksModel.taskToExecuteNext {
+        if let taskToExecuteNext = viewModel.taskToExecuteNext {
             if taskToExecuteNext.hasCompleted {
                 return
             }
             
             if let error = error {
-                tasksModel.taskToExecuteNext?.status = .failed
-                tasksModel.taskToExecuteNext?.error = error
+                viewModel.taskToExecuteNext?.status = .failed
+                viewModel.taskToExecuteNext?.error = error
             } else if let result = result {
-                tasksModel.taskToExecuteNext?.status = .succeeded
-                tasksModel.taskToExecuteNext?.result = result
+                viewModel.taskToExecuteNext?.status = .succeeded
+                viewModel.taskToExecuteNext?.result = result
             }
         }
     }
