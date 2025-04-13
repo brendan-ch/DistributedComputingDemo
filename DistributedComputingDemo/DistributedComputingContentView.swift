@@ -38,7 +38,7 @@ struct DistributedComputingContentView: View {
         }
         .navigationTitle("Home")
         
-        JavaScriptExecutableWebView(javascriptString: "console.log('Hello')") { result, error in
+        JavaScriptExecutableWebView(javascriptString: "(() => { return 'Task completed'; })();") { result, error in
         }
             .frame(height: 0)
     }
