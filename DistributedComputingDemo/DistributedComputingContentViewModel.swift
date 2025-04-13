@@ -7,9 +7,18 @@
 
 import Foundation
 
+struct TaskFromServer: Identifiable {
+    var id = UUID()
+    let name: String
+}
+
 class DistributedComputingContentViewModel: ObservableObject {
-    private var dataRefreshLoopTask: Task<Void, Error>?
     @Published var distributedComputingEnabled = false
+    
+    @Published var taskHistory: [TaskFromServer] = []
+    @Published var currentlyExecutingTask: TaskFromServer?
+    
+    private var dataRefreshLoopTask: Task<Void, Error>?
 
     func startRefreshingData(sleepDuration: Duration = .seconds(5)) {
         dataRefreshLoopTask = Task {

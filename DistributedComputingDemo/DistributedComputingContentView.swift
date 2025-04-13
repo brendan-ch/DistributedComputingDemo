@@ -22,7 +22,13 @@ struct DistributedComputingContentView: View {
             }
             
             Section("Past runs") {
-                Text("Past task runs go here.")
+                if viewModel.taskHistory.isEmpty {
+                    Text("Past task runs will go here.")
+                } else {
+                    ForEach(viewModel.taskHistory) { task in
+                        Text(task.name)
+                    }
+                }
             }
             
             Section("Stats") {
