@@ -42,12 +42,19 @@ struct DistributedComputingContentView: View {
                 }
             }
             
-            Section("Stats") {
-                Text("Stats will go here.")
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("How this works", systemImage: "info.circle")
+                        .font(.headline)
+                    Text("When computing is enabled, your device will check in with the server periodically to retrieve a JavaScript-based task. If one is found, it executes the code and reports the result back to the server.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 4)
             }
             
         }
-        .navigationTitle("Home")
+        .navigationTitle("Node Settings")
         
         if let taskToExecuteNext = viewModel.taskToExecuteNext {
             if taskToExecuteNext.status == .executing {
