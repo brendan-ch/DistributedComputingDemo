@@ -20,8 +20,8 @@ struct TaskFromServer: Identifiable {
     let name: String
     
     let javascriptCode: String
-    let result: Any?
-    let error: Any?
+    let result: Any? = nil
+    let error: Any? = nil
     
     let status: TaskStatus = .waiting
 }
@@ -63,6 +63,24 @@ class DistributedComputingContentViewModel: ObservableObject {
     }
     
     func refreshDataFromServer() {
-        print("Fetch data from server")
+        // TODO: Integrate code from the actual server
+        
+        print("Simulating new task from server")
+        
+        // I think this is valid JS?
+        let javascriptCode = """
+function addTwoNumbers() {
+    return 2 + 3;
+}
+
+addTwoNumbers();
+"""
+        
+        let newTask = TaskFromServer(
+            name: "Add two numbers",
+            javascriptCode: javascriptCode
+        );
+        
+        taskToExecuteNext = newTask
     }
 }
