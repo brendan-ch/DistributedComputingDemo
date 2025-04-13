@@ -50,7 +50,7 @@ class DistributedComputingContentViewModel: ObservableObject {
     func startRefreshingData(sleepDuration: Duration = .seconds(5)) {
         dataRefreshLoopTask = Task {
             while !Task.isCancelled {
-                print("Fetch data from server")
+                refreshDataFromServer()
                 try? await Task.sleep(for: sleepDuration)
             }
         }
@@ -59,5 +59,9 @@ class DistributedComputingContentViewModel: ObservableObject {
     func stopRefreshingData() {
         dataRefreshLoopTask?.cancel()
         dataRefreshLoopTask = nil
+    }
+    
+    func refreshDataFromServer() {
+        print("Fetch data from server")
     }
 }
