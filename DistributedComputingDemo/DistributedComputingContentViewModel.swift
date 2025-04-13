@@ -7,9 +7,21 @@
 
 import Foundation
 
+enum TaskStatus {
+    case waiting
+    case executing
+    case failed
+    case succeeded
+}
+
 struct TaskFromServer: Identifiable {
     var id = UUID()
     let name: String
+    
+    let javascriptCode: String
+    let output: String?
+    
+    let status: TaskStatus = .waiting
 }
 
 class DistributedComputingContentViewModel: ObservableObject {
