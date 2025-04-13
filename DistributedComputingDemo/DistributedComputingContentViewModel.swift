@@ -60,13 +60,22 @@ class DistributedComputingContentViewModel: ObservableObject {
     func stopRefreshingData() {
         dataRefreshLoopTask?.cancel()
         dataRefreshLoopTask = nil
+        taskToExecuteNext = nil
     }
     
     func refreshDataFromServer() {
         // TODO: Integrate code from the actual server
         
+        if let taskToExecuteNext = taskToExecuteNext {
+            if taskToExecuteNext.status != .failed || taskToExecuteNext.status != .succeeded {
+                // Task is currently being executed, stop server refresh
+                print("Task is currently waiting or executing, stopping server refresh")
+                return
+            }
+        }
         print("Simulating new task from server")
         
+
         // I think this is valid JS?
         let javascriptCode = """
 function addTwoNumbers() {
@@ -81,6 +90,8 @@ addTwoNumbers();
             javascriptCode: javascriptCode
         );
         
-        taskToExecuteNext = newTask
+        DispatchQueue.main.async { [weak self] in
+            self?.taskToExecuteNext = newTask
+        }
     }
 }
