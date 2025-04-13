@@ -37,6 +37,7 @@ struct DistributedComputingContentView: View {
                     TextField("Server base URL", text: $tasksModel.baseUrl)
                         .keyboardType(.URL)
                         .autocorrectionDisabled()
+                        .disabled(tasksModel.distributedComputingEnabled)
                 }
                 
                 Section(
