@@ -20,7 +20,8 @@ struct TaskFromServer: Identifiable {
     let name: String
     
     let javascriptCode: String
-    let output: String?
+    let result: Any?
+    let error: Any?
     
     let status: TaskStatus = .waiting
 }
@@ -29,7 +30,7 @@ class DistributedComputingContentViewModel: ObservableObject {
     @Published var distributedComputingEnabled = false
     
     @Published var taskHistory: [TaskFromServer] = []
-    @Published var currentlyExecutingTask: TaskFromServer?
+    @Published var taskToExecuteNext: TaskFromServer?
     
     private var dataRefreshLoopTask: Task<Void, Error>?
     
