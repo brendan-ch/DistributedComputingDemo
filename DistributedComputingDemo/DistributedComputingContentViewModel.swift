@@ -16,7 +16,6 @@ enum TaskStatus {
 
 struct TaskFromServer: Identifiable {
     var id = UUID()
-    let name: String
     
     let javascriptCode: String
     var result: Any? = nil
@@ -37,6 +36,14 @@ struct TaskFromServer: Identifiable {
         hasCompleted
         && (result != nil || error != nil)
     }
+}
+
+struct TaskFromServerResponse: Decodable {
+    let id: Int
+    let code: String
+    let status: String
+    let result: String?
+    let device_id: Int
 }
 
 class DistributedComputingContentViewModel: ObservableObject {
@@ -92,30 +99,38 @@ class DistributedComputingContentViewModel: ObservableObject {
         if let taskToExecuteNext = taskToExecuteNext {
             if !taskToExecuteNext.hasCompleted {
                 // Task is currently being executed, stop server refresh
-                print("Task is currently waiting or executing, stopping server refresh")
+                print("Task is currently waiting or executing, not refreshing from server")
                 return
             }
         }
-        print("Simulating new task from server")
         
+        let baseUrl = URL.apiBaseUrl
+        let url = baseUrl.appendingPathComponent("/tasks/next")
 
-        // I think this is valid JS?
-        let javascriptCode = """
-function addTwoNumbers() {
-    return 2 + 3;
-}
-
-addTwoNumbers();
-"""
-        
-        let newTask = TaskFromServer(
-            name: "Add two numbers",
-            javascriptCode: javascriptCode
-        );
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.taskToExecuteNext = newTask
-        }
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("Invalid server response")
+                return
+            }
+            
+            if httpResponse.statusCode != 200 {
+                print("Server returned with status code \(httpResponse.statusCode)")
+                return
+            }
+            
+            guard let data = data else { return }
+            print("Data received from server")
+            
+            if let decodedTask = try? JSONDecoder().decode(TaskFromServerResponse.self, from: data) {
+                let convertedTask = TaskFromServer(
+                    javascriptCode: decodedTask.code
+                )
+                
+                DispatchQueue.main.async {
+                    self?.taskToExecuteNext = convertedTask
+                }
+            }
+        }.resume()
     }
     
     func publishTaskCompletionToServer() {
