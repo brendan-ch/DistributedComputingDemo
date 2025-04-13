@@ -15,7 +15,7 @@ enum TaskStatus {
 }
 
 struct TaskFromServer: Identifiable {
-    var id = UUID()
+    let id: Int
     
     let javascriptCode: String
     var result: Any? = nil
@@ -72,7 +72,7 @@ class DistributedComputingContentViewModel: ObservableObject {
                 
                 if taskToExecuteNext.isReadyToPublishToServer {
                     // Publish to the server
-                    self?.publishTaskCompletionToServer()
+                    self?.publishTaskCompletionToServer(taskToExecuteNext)
                 }
             }
             .store(in: &cancellables)
@@ -94,8 +94,6 @@ class DistributedComputingContentViewModel: ObservableObject {
     }
     
     func refreshDataFromServer() {
-        // TODO: Integrate code from the actual server
-        
         if let taskToExecuteNext = taskToExecuteNext {
             if !taskToExecuteNext.hasCompleted {
                 // Task is currently being executed, stop server refresh
@@ -109,12 +107,11 @@ class DistributedComputingContentViewModel: ObservableObject {
 
         URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             guard let httpResponse = response as? HTTPURLResponse else {
-                print("Invalid server response")
                 return
             }
             
             if httpResponse.statusCode != 200 {
-                print("Server returned with status code \(httpResponse.statusCode)")
+                print("refreshDataFromServer: Server returned with status code \(httpResponse.statusCode)")
                 return
             }
             
@@ -123,6 +120,7 @@ class DistributedComputingContentViewModel: ObservableObject {
             
             if let decodedTask = try? JSONDecoder().decode(TaskFromServerResponse.self, from: data) {
                 let convertedTask = TaskFromServer(
+                    id: decodedTask.id,
                     javascriptCode: decodedTask.code
                 )
                 
@@ -133,10 +131,38 @@ class DistributedComputingContentViewModel: ObservableObject {
         }.resume()
     }
     
-    func publishTaskCompletionToServer() {
-        print("Simulating task completion publish")
+    func publishTaskCompletionToServer(_ task: TaskFromServer) {
+        let baseUrl = URL.apiBaseUrl
+        let url = baseUrl.appendingPathComponent("/tasks/\(task.id)/complete")
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        // Leave the task in the view model for reference
-//        taskToExecuteNext = nil
+        var result = "\(task.result ?? "")"
+        if task.error != nil {
+            result = "Error: \(String(describing: task.error))"
+        }
+        
+        let payload: [String: Any] = [
+            "status": "COMPLETE",
+            "result": result
+        ]
+
+        request.httpBody = try? JSONSerialization.data(withJSONObject: payload)
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("publishTaskCompletionToServer: No valid response")
+                return
+            }
+
+            if httpResponse.statusCode != 200 {
+                print("publishTaskCompletionToServer: Server returned with status code \(httpResponse.statusCode)")
+                return
+            }
+
+            print("Task completion published successfully")
+        }.resume()
     }
 }
