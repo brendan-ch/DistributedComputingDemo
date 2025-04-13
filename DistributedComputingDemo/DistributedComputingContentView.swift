@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct DistributedComputingToggleView: View {
-    @State var distributedComputingEnabled = false
+struct DistributedComputingContentView: View {
+    @StateObject var viewModel = DistributedComputingContentViewModel()
     
     var body: some View {
         List {
@@ -16,7 +16,7 @@ struct DistributedComputingToggleView: View {
                 header: Text("Toggle computing"),
                 footer: Text("Allow tasks to run on this device.")
             ) {
-                Toggle(isOn: $distributedComputingEnabled) {
+                Toggle(isOn: $viewModel.distributedComputingEnabled) {
                     Text("Computing enabled")
                 }
             }
@@ -34,5 +34,5 @@ struct DistributedComputingToggleView: View {
 }
 
 #Preview {
-    DistributedComputingToggleView()
+    DistributedComputingContentView()
 }
