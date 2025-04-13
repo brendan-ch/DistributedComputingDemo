@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DistributedComputingContentView: View {
-    @StateObject var viewModel = DistributedComputingContentViewModel()
+    @StateObject var viewModel = GlobalTasksModel()
     
     var lastRunText: String {
         if let taskToExecuteNext = viewModel.taskToExecuteNext {

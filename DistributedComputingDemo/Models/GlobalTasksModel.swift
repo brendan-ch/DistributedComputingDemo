@@ -22,10 +22,11 @@ struct TaskFromServerResponse: Decodable {
     let device_id: Int?
 }
 
-class DistributedComputingContentViewModel: ObservableObject {
+class GlobalTasksModel: ObservableObject {
     @Published var distributedComputingEnabled = false
     
     @Published var taskToExecuteNext: TaskFromServer?
+    @Published var pastTasks: [TaskFromServer] = []
     
     private var dataRefreshLoopTask: Task<Void, Error>?
     
