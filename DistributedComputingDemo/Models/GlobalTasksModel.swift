@@ -140,6 +140,9 @@ class GlobalTasksModel: ObservableObject {
             }
 
             print("Task completion published successfully")
+            DispatchQueue.main.async { [weak self] in
+                self?.pastTasks.append(task)
+            }
         }.resume()
     }
 }

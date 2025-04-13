@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct DistributedComputingContentView: View {
-    @StateObject var viewModel = GlobalTasksModel()
+    @EnvironmentObject var tasksModel: GlobalTasksModel
     
     var lastRunText: String {
-        if let taskToExecuteNext = viewModel.taskToExecuteNext {
+        if let taskToExecuteNext = tasksModel.taskToExecuteNext {
             if taskToExecuteNext.status == .executing {
                 return "Executing now..."
             }
@@ -26,9 +26,9 @@ struct DistributedComputingContentView: View {
         List {
             Section(
                 header: Text("Toggle computing"),
-                footer: Text(viewModel.distributedComputingEnabled ? "Monitoring for tasks on the server." : "Turn on to retrieve tasks from the server.")
+                footer: Text(tasksModel.distributedComputingEnabled ? "Monitoring for tasks on the server." : "Turn on to retrieve tasks from the server.")
             ) {
-                Toggle(isOn: $viewModel.distributedComputingEnabled) {
+                Toggle(isOn: $tasksModel.distributedComputingEnabled) {
                     Text("Computing enabled")
                 }
             }
@@ -56,7 +56,7 @@ struct DistributedComputingContentView: View {
         }
         .navigationTitle("Node Settings")
         
-        if let taskToExecuteNext = viewModel.taskToExecuteNext {
+        if let taskToExecuteNext = tasksModel.taskToExecuteNext {
             if taskToExecuteNext.status == .executing {
                 // Display the web view to execute the task
                 JavaScriptExecutableWebView(javascriptString: taskToExecuteNext.javascriptCode, completionHandler: webViewCallback)
@@ -67,18 +67,18 @@ struct DistributedComputingContentView: View {
     }
     
     func webViewCallback(_ result: Any?, _ error: Any?) {
-        if let taskToExecuteNext = viewModel.taskToExecuteNext {
+        if let taskToExecuteNext = tasksModel.taskToExecuteNext {
             if taskToExecuteNext.hasCompleted {
                 return
             }
             
             withAnimation {
                 if let error = error {
-                    viewModel.taskToExecuteNext?.status = .failed
-                    viewModel.taskToExecuteNext?.error = error
+                    tasksModel.taskToExecuteNext?.status = .failed
+                    tasksModel.taskToExecuteNext?.error = error
                 } else if let result = result {
-                    viewModel.taskToExecuteNext?.status = .succeeded
-                    viewModel.taskToExecuteNext?.result = result
+                    tasksModel.taskToExecuteNext?.status = .succeeded
+                    tasksModel.taskToExecuteNext?.result = result
                 }
             }
         }
@@ -87,4 +87,5 @@ struct DistributedComputingContentView: View {
 
 #Preview {
     DistributedComputingContentView()
+        .environmentObject(GlobalTasksModel())
 }
