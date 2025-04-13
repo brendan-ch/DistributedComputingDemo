@@ -8,7 +8,7 @@
 import Foundation
 
 extension URL {
-    static var apiBaseUrl: URL {
+    static var defaultApiBaseUrl: URL {
         return URL(string: "http://localhost:8000")!
     }
 }

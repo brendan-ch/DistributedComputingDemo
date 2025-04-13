@@ -28,6 +28,8 @@ class GlobalTasksModel: ObservableObject {
     @Published var taskToExecuteNext: TaskFromServer?
     @Published var pastTasks: [TaskFromServer] = []
     
+    @Published var baseUrl = URL.defaultApiBaseUrl.absoluteString
+    
     private var dataRefreshLoopTask: Task<Void, Error>?
     
     private var cancellables = Set<AnyCancellable>()
@@ -79,7 +81,7 @@ class GlobalTasksModel: ObservableObject {
             }
         }
         
-        let baseUrl = URL.apiBaseUrl
+        guard let baseUrl = URL(string: baseUrl) else { return }
         let url = baseUrl.appendingPathComponent("/tasks/next")
 
         URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
@@ -109,7 +111,7 @@ class GlobalTasksModel: ObservableObject {
     }
     
     func publishTaskCompletionToServer(_ task: TaskFromServer) {
-        let baseUrl = URL.apiBaseUrl
+        guard let baseUrl = URL(string: baseUrl) else { return }
         let url = baseUrl.appendingPathComponent("/tasks/\(task.id)/complete")
 
         var request = URLRequest(url: url)

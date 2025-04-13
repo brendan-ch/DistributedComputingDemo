@@ -31,6 +31,10 @@ struct DistributedComputingContentView: View {
                 Toggle(isOn: $tasksModel.distributedComputingEnabled) {
                     Text("Computing enabled")
                 }
+                
+                TextField("Server base URL", text: $tasksModel.baseUrl)
+                    .keyboardType(.URL)
+                    .autocorrectionDisabled()
             }
             
             Section(
