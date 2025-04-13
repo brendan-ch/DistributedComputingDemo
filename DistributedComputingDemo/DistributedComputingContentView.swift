@@ -34,8 +34,13 @@ struct DistributedComputingContentView: View {
             Section("Stats") {
                 Text("Stats will go here.")
             }
+            
         }
         .navigationTitle("Home")
+        
+        JavaScriptExecutableWebView(javascriptString: "console.log('Hello')") { result, error in
+        }
+            .frame(height: 0)
     }
 }
 
