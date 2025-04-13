@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 enum TaskStatus {
     case waiting
@@ -31,6 +32,20 @@ class DistributedComputingContentViewModel: ObservableObject {
     @Published var currentlyExecutingTask: TaskFromServer?
     
     private var dataRefreshLoopTask: Task<Void, Error>?
+    
+    private var cancellables = Set<AnyCancellable>()
+    
+    init() {
+        $distributedComputingEnabled
+            .sink { [weak self] isEnabled in
+                if isEnabled {
+                    self?.startRefreshingData()
+                } else {
+                    self?.stopRefreshingData()
+                }
+            }
+            .store(in: &cancellables)
+    }
 
     func startRefreshingData(sleepDuration: Duration = .seconds(5)) {
         dataRefreshLoopTask = Task {
