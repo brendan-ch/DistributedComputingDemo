@@ -26,6 +26,10 @@ struct TaskFromServer: Identifiable {
     var hasCompleted: Bool {
         status == .failed || status == .succeeded
     }
+    var isReadyToPublishToServer: Bool {
+        hasCompleted
+        && (result != nil || error != nil)
+    }
 }
 
 class DistributedComputingContentViewModel: ObservableObject {
@@ -51,7 +55,12 @@ class DistributedComputingContentViewModel: ObservableObject {
         
         $taskToExecuteNext
             .sink { [weak self] taskToExecuteNext in
-                print(taskToExecuteNext)
+                guard let taskToExecuteNext = taskToExecuteNext else { return }
+                
+                if taskToExecuteNext.isReadyToPublishToServer {
+                    // Publish to the server
+                    self?.publishTaskCompletionToServer()
+                }
             }
             .store(in: &cancellables)
     }
@@ -101,5 +110,11 @@ addTwoNumbers();
         DispatchQueue.main.async { [weak self] in
             self?.taskToExecuteNext = newTask
         }
+    }
+    
+    func publishTaskCompletionToServer() {
+        print("Simulating task completion publish")
+        
+        taskToExecuteNext = nil
     }
 }
