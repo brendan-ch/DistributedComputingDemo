@@ -26,7 +26,7 @@ struct DistributedComputingContentView: View {
         List {
             Section(
                 header: Text("Toggle computing"),
-                footer: Text("Allow tasks to run on this device.")
+                footer: Text(viewModel.distributedComputingEnabled ? "Monitoring for tasks on the server." : "Turn on to retrieve tasks from the server.")
             ) {
                 Toggle(isOn: $viewModel.distributedComputingEnabled) {
                     Text("Computing enabled")
