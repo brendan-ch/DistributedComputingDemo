@@ -41,13 +41,27 @@ struct DistributedComputingContentView: View {
         if let taskToExecuteNext = viewModel.taskToExecuteNext {
             if taskToExecuteNext.status == .executing {
                 // Display the web view to execute the task
-                JavaScriptExecutableWebView(javascriptString: taskToExecuteNext.javascriptCode) { result, error in
-                    // TODO: Update the result in the view model
-                }
+                JavaScriptExecutableWebView(javascriptString: taskToExecuteNext.javascriptCode, completionHandler: webViewCallback)
                     .frame(height: 0)
             }
         }
         
+    }
+    
+    func webViewCallback(_ result: Any?, _ error: Any?) {
+        if let taskToExecuteNext = viewModel.taskToExecuteNext {
+            if taskToExecuteNext.hasCompleted {
+                return
+            }
+            
+            if let error = error {
+                viewModel.taskToExecuteNext?.status = .failed
+                viewModel.taskToExecuteNext?.error = error
+            } else if let result = result {
+                viewModel.taskToExecuteNext?.status = .succeeded
+                viewModel.taskToExecuteNext?.result = result
+            }
+        }
     }
 }
 

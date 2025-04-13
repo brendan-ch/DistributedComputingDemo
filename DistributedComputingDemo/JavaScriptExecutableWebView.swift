@@ -26,9 +26,6 @@ struct JavaScriptExecutableWebView: UIViewRepresentable {
         let blankPage = "<!DOCTYPE html><html><body></body></html>"
         uiView.loadHTMLString(blankPage, baseURL: nil)
         uiView.evaluateJavaScript(javascriptString) { result, error in
-            print(result ?? "No result value")
-            print(error ?? "No error")
-            
             if let completionHandler = completionHandler {
                 completionHandler(result, error)
             }

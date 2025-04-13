@@ -19,10 +19,13 @@ struct TaskFromServer: Identifiable {
     let name: String
     
     let javascriptCode: String
-    let result: Any? = nil
-    let error: Any? = nil
+    var result: Any? = nil
+    var error: Any? = nil
     
     var status: TaskStatus = .executing
+    var hasCompleted: Bool {
+        status == .failed || status == .succeeded
+    }
 }
 
 class DistributedComputingContentViewModel: ObservableObject {
@@ -43,6 +46,12 @@ class DistributedComputingContentViewModel: ObservableObject {
                 } else {
                     self?.stopRefreshingData()
                 }
+            }
+            .store(in: &cancellables)
+        
+        $taskToExecuteNext
+            .sink { [weak self] taskToExecuteNext in
+                print(taskToExecuteNext)
             }
             .store(in: &cancellables)
     }
@@ -66,7 +75,7 @@ class DistributedComputingContentViewModel: ObservableObject {
         // TODO: Integrate code from the actual server
         
         if let taskToExecuteNext = taskToExecuteNext {
-            if taskToExecuteNext.status != .failed || taskToExecuteNext.status != .succeeded {
+            if !taskToExecuteNext.hasCompleted {
                 // Task is currently being executed, stop server refresh
                 print("Task is currently waiting or executing, stopping server refresh")
                 return
