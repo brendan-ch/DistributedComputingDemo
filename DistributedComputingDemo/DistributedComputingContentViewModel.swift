@@ -9,7 +9,6 @@ import Foundation
 import Combine
 
 enum TaskStatus {
-    case waiting
     case executing
     case failed
     case succeeded
@@ -23,7 +22,7 @@ struct TaskFromServer: Identifiable {
     let result: Any? = nil
     let error: Any? = nil
     
-    let status: TaskStatus = .waiting
+    var status: TaskStatus = .executing
 }
 
 class DistributedComputingContentViewModel: ObservableObject {

@@ -38,9 +38,16 @@ struct DistributedComputingContentView: View {
         }
         .navigationTitle("Home")
         
-        JavaScriptExecutableWebView(javascriptString: "(() => { return 'Task completed'; })();") { result, error in
+        if let taskToExecuteNext = viewModel.taskToExecuteNext {
+            if taskToExecuteNext.status == .executing {
+                // Display the web view to execute the task
+                JavaScriptExecutableWebView(javascriptString: taskToExecuteNext.javascriptCode) { result, error in
+                    // TODO: Update the result in the view model
+                }
+                    .frame(height: 0)
+            }
         }
-            .frame(height: 0)
+        
     }
 }
 
