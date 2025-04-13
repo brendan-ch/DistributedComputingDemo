@@ -42,6 +42,7 @@ class DistributedComputingContentViewModel: ObservableObject {
     }
     
     func stopRefreshingData() {
-        
+        dataRefreshLoopTask?.cancel()
+        dataRefreshLoopTask = nil
     }
 }
